@@ -1,4 +1,5 @@
 import random
+from .constants import Item, CardType
 
 class Player:
     LOGO_SIZE = 128, 128
@@ -28,23 +29,32 @@ class Player:
         self.hero = hero
         self.sprite = sprite
 
-    def add_item(self, item):
+    def add_item(self, item: Item):
         if item not in self._items:
             self._items.append(item)
+            print(f"*Collected [ {item} ] to inventory*")
 
-    def use_item(self, item):
-        if item in self._items:
-            self._items.remove(item)
-            return True
+    def use_item(self, itype):
+        for item in self._items:
+            if item.type == itype:
+                self._items.remove(item)
+                print(f"*Used [ {item} ] from inventory*")
+                return True
         return False
 
-    def has_item(self, item):
-        if item in self._items:
-            return True
+    def has_item(self, itype):
+        for item in self._items:
+            if item.type == itype:
+                return True
         return False
 
     def move_to(self, square):
         self._tile = square
+
+    def retreat(self, step):
+        self._tile -= step
+        if self._tile < 1:
+            self._tile = 1
 
     def take_damage(self, dmg):
         self.health -= dmg
@@ -60,20 +70,38 @@ class Player:
     def luck(self):
         return random.randint(1, 5)
 
-    def attack_monster(self, dmg, stk):
-        if self.has_item('SPCL'):
-            self.use_item('SPCL')
+    def attack_monster(self, dmg, step):
+        if self.has_item(CardType.MAGIC):
+            self.use_item(CardType.MAGIC)
+            print('*Defeated monster with the power of Magic*')
         else:
-            if self.has_item('ATK'):
-                self.use_item('ATK')
+            if self.has_item(CardType.DEFEND):
+                self.use_item(CardType.MAGIC)
+                print('*Blocked damage from monster*')
             else:
-                self.tile -= stk
-                if self.tile < 1:
-                    self.tile = 1
-            if self.has_item('DEF'):
-                self.use_item('DEF')
+                self.take_damage(dmg)
+                print(f'$Took [ {dmg} ] damage from the monster$')
+            if self.has_item(CardType.ATTACK):
+                self.use_item(CardType.ATTACK)
+                print('*Slayed monster to death*')
             else:
-                self.health -= dmg
-                if self.health <= 0:
-                    self.health = 100
-                    self.tile = 1
+                self.retreat(step)
+                print(f'$Not enough weapon! Retreated [ {step} ] steps for recovery$')
+
+        # def attack_monster(self, dmg, stk):
+    #     if self.has_item('SPCL'):
+    #         self.use_item('SPCL')
+    #     else:
+    #         if self.has_item('ATK'):
+    #             self.use_item('ATK')
+    #         else:
+    #             self.tile -= stk
+    #             if self.tile < 1:
+    #                 self.tile = 1
+    #         if self.has_item('DEF'):
+    #             self.use_item('DEF')
+    #         else:
+    #             self.health -= dmg
+    #             if self.health <= 0:
+    #                 self.health = 100
+    #                 self.tile = 1

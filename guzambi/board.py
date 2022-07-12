@@ -1,5 +1,5 @@
 import random
-from .constants import BOARD_SIZE, ITEMS, POTIONS, DRAGON, BEAST
+from .constants import BOARD_SIZE, BACKS, ITEMS, POTIONS, Dragons, BEASTS, CardType
 from .player import Player
 
 class Board:
@@ -12,6 +12,8 @@ class Board:
         self.p1 = Player('P1')
         self.p2 = Player('P2')
         self.current_player = self.p1
+        self._chosen_card = None
+        self.current_card_img = BACKS.img
 
     def get_table(self):
         table = []
@@ -37,8 +39,8 @@ class Board:
             return self.p2
 
     @staticmethod
-    def roll_dice(from_, to_):
-        return random.choice(range(from_, to_ + 1))
+    def roll_dice():
+        return random.choice(range(1, 5))
 
     def set_hero(self, hero):
         if self.p1.sprite is None:
@@ -55,22 +57,39 @@ class Board:
         if square >= self.SIZE:
             square = self.SIZE
         self.current_player.move_to(square)
-        self.next_turn()
 
     def get_fortune_card(self):
-        player = self.current_player
-        luck_meter = player.luck
+        self._chosen_card = self._fortune_card
+        self.current_card_img = self._chosen_card.img
+
+    def take_action(self):
+        card = self._chosen_card
+        if card.type == CardType.HEAL:
+            self.current_player.heal(card.ability)
+        elif card.type == CardType.SPEED:
+            self.move_player(card.ability)
+        elif card.type == CardType.DRAGON or card.type == CardType.BEAST:
+            self.current_player.attack_monster(card.dmg, card.step)
+        else:
+            self.current_player.add_item(card)
+        self.current_card_img = BACKS.img
+        self.next_turn()
+
+    @property
+    def _fortune_card(self):
+        luck_meter = self.current_player.luck
         if luck_meter <= 2:
-            monster_level = player.luck
+            monster_level = self.current_player.luck
             if monster_level == 5:
                 print('Dragon', monster_level, luck_meter)
-                return DRAGON
+                return Dragons
             else:
                 print('Monster', monster_level, luck_meter)
-                return BEAST
+                return BEASTS
         elif luck_meter <= 4:
             print('Item')
             return random.choice(ITEMS)
         else:
             print('Potion')
             return random.choice(POTIONS)
+
