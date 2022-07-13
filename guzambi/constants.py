@@ -1,8 +1,10 @@
 import random
-from pygame import image, transform, Rect, Surface, Color
+from pygame import image, transform, Rect, surface, Color
 from enum import Enum
 
-WIDTH = 700
+Image = surface.Surface
+
+WIDTH = 800
 BOARD_SIZE = 5
 IMG_SRC = '../img/'
 
@@ -32,7 +34,7 @@ class CardType(Enum):
     SPEED = 7
 
 class Card:
-    def __init__(self, ctype: CardType, assets: list[Surface], info: Surface):
+    def __init__(self, ctype: CardType, assets: list[Image], info: Image):
         self.type = ctype
         self.assets = assets
         self.info = info
@@ -76,7 +78,7 @@ def make_card_img(img_name):
 
 # Loading Images
 COVER_IMG = transform.scale(image.load(IMG_SRC + 'fantasy1.jpg'), (WIDTH, HEIGHT))
-BGIMG = transform.scale(image.load(IMG_SRC + 'bg1.jpg'), (BOARD_WIDTH, BOARD_WIDTH))
+BGIMG = transform.scale(image.load(IMG_SRC + 'bg1.jpg'), (WIDTH, HEIGHT))
 NAMEPAD = image.load(IMG_SRC + 'name_pad.png')
 NAMEPAD_ACTIVE = image.load(IMG_SRC + 'name_pad_hl.png')
 ICONPAD = transform.scale(image.load(IMG_SRC + 'icon_pad.png'), (TILE_WIDTH+10, TILE_WIDTH+10))
@@ -156,13 +158,13 @@ BACK3 = transform.scale(image.load(IMG_SRC + 'stoneback1.png'), (CARD_WIDTH, CAR
 back_assets = [BACK1, BACK2, BACK3]
 
 # Card Collections
-WARRIOR = Legend('Mighty Warrior', WAR_CARD, WAR_CHAR)
+WARRIOR = Legend('Dragon Slayer', WAR_CARD, WAR_CHAR)
 ORC = Legend('Savage Goblin', ORC_CARD, ORC_CHAR)
-KNIGHT = Legend('Skeleton Knight', KNT_CARD, KNIGHT_CHAR)
-WIZARD = Legend('Sacred Wizard', WIZ_CARD, WIZARD_CHAR)
+KNIGHT = Legend('Immortal Knight', KNT_CARD, KNIGHT_CHAR)
+WIZARD = Legend('Supreme Wizard', WIZ_CARD, WIZARD_CHAR)
 LEGENDS = [WARRIOR, ORC, KNIGHT, WIZARD]
 
-Dragons = Monster(CardType.DRAGON, dragon_assets, dragon_info, 30, 3)
+DRAGONS = Monster(CardType.DRAGON, dragon_assets, dragon_info, 30, 3)
 BEASTS = Monster(CardType.BEAST, beast_assets, beast_info, 10, 1)
 
 ATTACK_ITEM = Item(CardType.ATTACK, attack_assets, atk_info, ATK_ICON)
@@ -203,7 +205,7 @@ CTN_IMG = transform.scale(image.load(IMG_SRC + 'continue_btn.png'), (150, 50))
 num_base = image.load(IMG_SRC + 'profile.jpg')
 
 LIGHT = Color(236, 240, 241)
-GLASS = Color(236, 240, 241, 150)
+GLASS = Color(236, 230, 231, 150)
 BLUE = Color(41, 128, 185)
 GREY = Color(52, 73, 94)
 DARK = Color(44, 62, 80)

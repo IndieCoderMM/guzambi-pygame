@@ -1,9 +1,10 @@
-from .constants import WIDTH, HEIGHT, MARGIN, TILE_WIDTH, HEADER, LEGENDS, DICE, BOARD_WIDTH, FOOTER, CardType, COVER_IMG, GLASS, RED, LIGHT, BLUE, DARK, GREEN, YELLOW, GREY, ORANGE, PURPLE, NAMEPAD, NAMEPAD_ACTIVE, ICONPAD, WINNER_BADGE, MSGPAD
+from .constants import (WIDTH, HEIGHT, MARGIN, TILE_WIDTH, HEADER, LEGENDS,
+                        DICE, BOARD_WIDTH, FOOTER, CardType, COVER_IMG, BGIMG,
+                        GLASS, RED, LIGHT, BLUE, DARK, GREEN, YELLOW, GREY, ORANGE,
+                        NAMEPAD, NAMEPAD_ACTIVE, Image, ICONPAD, WINNER_BADGE, MSGPAD)
 from .player import Player
 from .board import Board
 import pygame
-
-Image = pygame.Surface
 
 class GUI:
     TILE_COLOR = GLASS
@@ -24,7 +25,7 @@ class GUI:
         return left, top
 
     @staticmethod
-    def get_selected_hero(pos: tuple):
+    def get_selected_hero(pos: tuple[int, int]):
         x, y = pos
         for hero in LEGENDS:
             if hero.card_rect.collidepoint(x, y):
@@ -32,7 +33,7 @@ class GUI:
         return None
 
     @staticmethod
-    def dice_clicked(pos: tuple):
+    def dice_clicked(pos: tuple[int, int]):
         x, y = pos
         if DICE.rect.collidepoint(x, y):
             return True
@@ -103,7 +104,7 @@ class GUI:
         texty = top + int(TILE_WIDTH / 2)
         self.draw_text(str(num), DARK, 20, textx, texty)
 
-    def show_dice_num(self, num):
+    def show_dice_num(self, num: int):
         dice_img = DICE.get_num_img(num)
         x = DICE.rect.x - DICE.rect.width - 10
         y = DICE.rect.y
@@ -111,7 +112,7 @@ class GUI:
         self.window.blit(dice_img, (x, y))
         pygame.display.update()
 
-    def draw_dice_animation(self, board):
+    def draw_dice_animation(self, board: Board):
         for _ in range(20):
             num = board.roll_dice()
             self.show_dice_num(num)
@@ -139,7 +140,7 @@ class GUI:
                     y += TILE_WIDTH // 2
                     self.window.blit(player_img, (x, y))
 
-    def draw_card(self, card_img: Image, rect: pygame.Rect, pos: tuple[int, int]):
+    def draw_card(self, card_img: Image, rect: pygame.rect.Rect, pos: tuple[int, int]):
         rect.topleft = pos
         self.window.blit(card_img, pos)
 
@@ -150,29 +151,29 @@ class GUI:
             x = MARGIN + hero.card_rect.width * i + gap * (i+1)
             self.draw_card(hero.card, hero.card_rect, (x, y))
             if hero.sprite == board.p1.sprite:
-                self.draw_text('P1', YELLOW, 20, x+hero.card_rect.width//2, y-20, title=True)
+                self.draw_text('P1', DARK, 20, x+hero.card_rect.width//2, y-30, title=True, bg_img=ICONPAD)
             elif hero.sprite == board.p2.sprite:
-                self.draw_text('P2', YELLOW, 20, x+hero.card_rect.width//2, y-20, title=True)
+                self.draw_text('P2', DARK, 20, x+hero.card_rect.width//2, y-30, title=True, bg_img=ICONPAD)
 
-    def display_info(self, txt):
+    def display_info(self, txt: str):
         self.draw_text(txt, YELLOW, 20, y=HEADER-50, align='center', bg_img=MSGPAD)
         pygame.display.update()
 
-    def display_menu(self, board):
-        self.window.fill(self.BG_COLOR)
+    def display_menu(self, board: Board):
+        self.window.blit(BGIMG, (0, 0))
         self.draw_text('GUZAMBI', YELLOW, 70, align='center', title=True, shadow=True)
-        self.draw_text('Journey Into Mystery', ORANGE, 30, y=80, align='center', title=True, shadow=True)
+        self.draw_text('Fantasy Adventure', ORANGE, 30, y=80, align='center', title=True, shadow=True)
         if board.p1.sprite is None:
             selecting_player = 'Player 1'
         else:
             selecting_player = 'Player 2'
         self.draw_selection_cards(board)
         if board.p2.sprite is not None:
-            self.draw_text(f'Entering into the Valley of Death...', LIGHT, 30, y=HEADER + 30, align='center', shadow=True)
+            self.draw_text(f'Entering into the Valley of Death...', LIGHT, 30, y=HEADER + 30, align='center', shadow=True, bg_img=MSGPAD)
             pygame.display.update()
             pygame.time.wait(500)
         else:
-            self.draw_text(f'[ {selecting_player} ] Select Your Hero...', LIGHT, 30, y=HEADER + 30, align='left', shadow=True)
+            self.draw_text(f'[ {selecting_player} ] Select Your Character...', YELLOW, 20, y=HEADER + 100, align='center', shadow=True, bg_img=MSGPAD)
         pygame.display.update()
 
     def display_fortune_card(self, card_img: Image):
@@ -191,13 +192,12 @@ class GUI:
         self.window.blit(DICE.icon, DICE.rect)
         pygame.display.update()
 
-    def display_gameover(self, board):
-        self.window.blit(COVER_IMG, (0, 0))
+    def display_gameover(self, board: Board):
+        self.window.blit(BGIMG, (0, 0))
         self.window.blit(WINNER_BADGE, (WIDTH//2-WINNER_BADGE.get_width()//2, 30))
-        self.draw_text(f"{board.winner.hero_name}", ORANGE, 20, y=HEIGHT//2-80, align='center', title=True)
+        self.draw_text(f"{board.winner.hero_name}", RED, 20, y=HEIGHT//2-80, align='center', title=True)
         self.draw_text("has completed the journey!", GREY, 25, y=HEIGHT // 2 - 50, align='center')
-        self.draw_text("Another adventures", GREY, 20, y=HEIGHT//2, align='center')
-        self.draw_text(" are waiting for you...", GREY, 20, y=HEIGHT // 2 + 35, align='center')
-
+        self.draw_text("Another adventures are", GREY, 20, y=HEIGHT//2, align='center')
+        self.draw_text("  waiting for you...", GREY, 20, y=HEIGHT // 2 + 35, align='center')
         pygame.display.update()
 

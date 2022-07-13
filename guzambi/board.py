@@ -1,5 +1,5 @@
 import random
-from .constants import BOARD_SIZE, BACKS, ITEMS, POTIONS, Dragons, BEASTS, CardType
+from .constants import BOARD_SIZE, BACKS, ITEMS, POTIONS, DRAGONS, BEASTS, CardType, Legend
 from .player import Player
 
 class Board:
@@ -42,7 +42,7 @@ class Board:
     def roll_dice():
         return random.choice(range(1, 5))
 
-    def set_hero(self, hero):
+    def set_hero(self, hero: Legend):
         if self.p1.sprite is None:
             self.p1.set_hero(hero.name, hero.sprite)
             return False
@@ -52,7 +52,7 @@ class Board:
     def next_turn(self):
         self.current_player = self.p2 if self.current_player == self.p1 else self.p1
 
-    def move_player(self, step):
+    def move_player(self, step: int):
         square = self.current_player.tile + step
         if square >= self.SIZE:
             square = self.SIZE
@@ -77,19 +77,15 @@ class Board:
 
     @property
     def _fortune_card(self):
-        luck_meter = self.current_player.luck
+        luck_meter = self.current_player.luck(1, 5)
         if luck_meter <= 2:
-            monster_level = self.current_player.luck
-            if monster_level == 5:
-                print('Dragon', monster_level, luck_meter)
-                return Dragons
+            monster_level = self.current_player.luck(1, 3)
+            if monster_level == 3:
+                return DRAGONS
             else:
-                print('Monster', monster_level, luck_meter)
                 return BEASTS
         elif luck_meter <= 4:
-            print('Item')
             return random.choice(ITEMS)
         else:
-            print('Potion')
             return random.choice(POTIONS)
 

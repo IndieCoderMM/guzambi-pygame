@@ -1,8 +1,8 @@
-from guzambi.game import Game
 import pygame
+import guzambi
 
 def main():
-    game = Game('Guzambi')
+    game = guzambi.Game('Guzambi')
     running = True
     clock = pygame.time.Clock()
     while running:
@@ -20,3 +20,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# TODO: Features to Add
+#   1. Add attributes to each character
+#   2. Display card info
+#   3. Add sound effects
